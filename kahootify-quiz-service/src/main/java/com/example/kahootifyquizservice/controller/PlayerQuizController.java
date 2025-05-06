@@ -22,7 +22,7 @@ public class PlayerQuizController {
 
     private final QuizService quizService;
 
-    @GetMapping("/waiting")
+    @GetMapping("/waitingoractive")
     public ResponseEntity<ActiveQuizResponse> getWaitingQuiz() {
         return ResponseEntity.ok(quizService.getActiveQuiz());
     }

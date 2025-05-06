@@ -17,3 +17,8 @@ springdoc:
 jwt:
   secret: u1iV2PwrN+8MfS5K2V7jGfI5PxqMu5LMxdLBewm06x8=
 
+cors:
+  allowed-origins:
+    - http://localhost:3000
+    - http://192.168.1.196:3000
+

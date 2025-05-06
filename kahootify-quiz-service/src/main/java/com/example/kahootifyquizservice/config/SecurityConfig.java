@@ -19,7 +19,10 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf().disable()
+        http
+                .cors() // ✅ Allow Spring to use your CorsConfig
+                .and()
+                .csrf().disable()
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/player/**").hasAnyRole("PLAYER", "ADMIN")
@@ -31,5 +34,6 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 }
 

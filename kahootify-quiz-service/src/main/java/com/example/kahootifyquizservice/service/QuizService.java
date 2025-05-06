@@ -267,7 +267,7 @@ public class QuizService {
         for (UserAnswer answer : allAnswers) {
             LeaderboardEntryResponse entry = leaderboardMap.getOrDefault(
                     answer.getUserId(),
-                    new LeaderboardEntryResponse(answer.getUserId(), 0, 0)
+                    new LeaderboardEntryResponse(answer.getUserId(), answer.getUsername(), 0, 0)
             );
 
             if (answer.isCorrect()) {
