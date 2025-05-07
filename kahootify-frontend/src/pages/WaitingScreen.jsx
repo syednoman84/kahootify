@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -6,29 +6,35 @@ import {
   CircularProgress,
   Paper
 } from '@mui/material';
-import quizApi from '../utils/quizApi';
+import { Client } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 
 const WaitingScreen = () => {
-  const [quizActive, setQuizActive] = useState(false);
-  const [quizTitle, setQuizTitle] = useState('');
   const navigate = useNavigate();
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
-    const interval = setInterval(async () => {
-      try {
-        const res = await quizApi.get('/player/quiz/waitingoractive'); 
-        if (res.data.active) {
-          setQuizActive(true);
-          setQuizTitle(res.data.title);
-          navigate(`/quiz/${res.data.id}`);
-        }
-      } catch (err) {
-        console.error('Error polling for active quiz:', err);
+    const client = new Client({
+      webSocketFactory: () => new SockJS('http://localhost:8082/ws'),
+      connectHeaders: {
+        Authorization: `Bearer ${token}`
+      },
+      onConnect: () => {
+        client.subscribe('/topic/quiz-status', (message) => {
+          const data = JSON.parse(message.body);
+          if (data.status === 'QUIZ_STARTED') {
+            navigate(`/quiz/${data.quizId}`);
+          }
+        });
+      },
+      onStompError: (frame) => {
+        console.error('STOMP Error:', frame.headers['message']);
       }
-    }, 3000); // Poll every 3 seconds
+    });
 
-    return () => clearInterval(interval);
-  }, [navigate]);
+    client.activate();
+    return () => client.deactivate();
+  }, [navigate, token]);
 
   return (
     <Box height="100vh" display="flex" justifyContent="center" alignItems="center" bgcolor="#1a202c">

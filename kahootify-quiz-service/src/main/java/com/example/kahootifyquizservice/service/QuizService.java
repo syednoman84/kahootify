@@ -286,5 +286,30 @@ public class QuizService {
                 .collect(Collectors.toList());
     }
 
+    public void stopQuizAndCalculateResults(Long quizId) {
+        Quiz quiz = quizRepository.findById(quizId)
+                .orElseThrow(() -> new RuntimeException("Quiz not found"));
+
+        quiz.setActive(false);
+        quizRepository.save(quiz);
+
+        calculateAndStoreResults(quizId); // this is your existing method
+    }
+
+    public Quiz stopQuiz(Long quizId) {
+        Quiz quiz = quizRepository.findById(quizId)
+                .orElseThrow(() -> new RuntimeException("Quiz not found"));
+
+        quiz.setActive(false);
+        quiz.setEndedAt(LocalDateTime.now());
+        quizRepository.save(quiz);
+
+        // Store results after stopping
+        calculateAndStoreResults(quizId);
+
+        return quiz;
+    }
+
+
 }
 

@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box, Typography, TextField, Button, Paper, Grid, Divider
+  Box, Typography, TextField, Button, Paper, Divider, Stack, MenuItem,
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, IconButton
 } from '@mui/material';
 import quizApi from '../utils/quizApi';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 
 const ManageQuestions = () => {
   const [questions, setQuestions] = useState([]);
@@ -12,8 +15,11 @@ const ManageQuestions = () => {
     optionB: '',
     optionC: '',
     optionD: '',
-    correctAnswer: ''
+    correctAnswer: '',
+    type: 'MCQ'
   });
+
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
     fetchQuestions();
@@ -21,7 +27,9 @@ const ManageQuestions = () => {
 
   const fetchQuestions = async () => {
     try {
-      const res = await quizApi.get('/admin/questions');
+      const res = await quizApi.get('/admin/questions', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       setQuestions(res.data);
     } catch (err) {
       console.error('Failed to load questions', err);
@@ -34,7 +42,19 @@ const ManageQuestions = () => {
 
   const handleSubmit = async () => {
     try {
-      await quizApi.post('/admin/questions', form);
+      let payload = { ...form };
+
+      if (form.type === 'TRUE_FALSE') {
+        payload.optionA = 'True';
+        payload.optionB = 'False';
+        payload.optionC = '';
+        payload.optionD = '';
+      }
+
+      await quizApi.post('/admin/questions', payload, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
       alert('Question added successfully');
       setForm({
         text: '',
@@ -42,7 +62,8 @@ const ManageQuestions = () => {
         optionB: '',
         optionC: '',
         optionD: '',
-        correctAnswer: ''
+        correctAnswer: '',
+        type: 'MCQ'
       });
       fetchQuestions();
     } catch (err) {
@@ -51,61 +72,140 @@ const ManageQuestions = () => {
     }
   };
 
+  const handleEdit = (question) => {
+    setForm({
+      text: question.text,
+      optionA: question.optionA || '',
+      optionB: question.optionB || '',
+      optionC: question.optionC || '',
+      optionD: question.optionD || '',
+      correctAnswer: question.correctAnswer,
+      type: question.type,
+      id: question.id, // Add id to form state for update
+    });
+  };
+  
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this question?')) return;
+    try {
+      await quizApi.delete(`/admin/questions/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      fetchQuestions();
+    } catch (err) {
+      console.error('Failed to delete question', err);
+      alert('Error deleting question');
+    }
+  };
+  
   return (
-    <Box maxWidth={900} mx="auto" mt={4}>
+    <Box maxWidth={1100} mx="auto" mt={4}>
       <Paper elevation={4} sx={{ padding: 4 }}>
         <Typography variant="h4" gutterBottom>Manage Questions</Typography>
 
         <Typography variant="h6" gutterBottom>Add New Question</Typography>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="Question Text"
-              name="text"
-              value={form.text}
-              onChange={handleChange}
-            />
-          </Grid>
-          {['A', 'B', 'C', 'D'].map(letter => (
-            <Grid item xs={6} sm={3} key={letter}>
+
+        <Stack spacing={2}>
+          <TextField
+            select
+            fullWidth
+            label="Question Type"
+            name="type"
+            value={form.type}
+            onChange={handleChange}
+          >
+            <MenuItem value="MCQ">Multiple Choice (MCQ)</MenuItem>
+            <MenuItem value="TRUE_FALSE">True / False</MenuItem>
+          </TextField>
+
+          <TextField
+            fullWidth
+            label="Question Text"
+            name="text"
+            value={form.text}
+            onChange={handleChange}
+          />
+
+          {form.type === 'MCQ' && (
+            <>
+              {['A', 'B', 'C', 'D'].map(letter => (
+                <TextField
+                  key={letter}
+                  fullWidth
+                  label={`Option ${letter}`}
+                  name={`option${letter}`}
+                  value={form[`option${letter}`]}
+                  onChange={handleChange}
+                />
+              ))}
               <TextField
                 fullWidth
-                label={`Option ${letter}`}
-                name={`option${letter}`}
-                value={form[`option${letter}`]}
+                label="Correct Answer (A/B/C/D)"
+                name="correctAnswer"
+                value={form.correctAnswer}
                 onChange={handleChange}
               />
-            </Grid>
-          ))}
-          <Grid item xs={6}>
+            </>
+          )}
+
+          {form.type === 'TRUE_FALSE' && (
             <TextField
               fullWidth
-              label="Correct Answer (A/B/C/D)"
+              label="Correct Answer (A/B)"
               name="correctAnswer"
               value={form.correctAnswer}
               onChange={handleChange}
+              helperText="Choose A for True or B for False"
             />
-          </Grid>
-        </Grid>
-        <Box mt={2}>
+          )}
+
           <Button variant="contained" onClick={handleSubmit}>Add Question</Button>
-        </Box>
+        </Stack>
 
         <Divider sx={{ my: 4 }} />
 
         <Typography variant="h6" gutterBottom>Existing Questions</Typography>
-        {questions.length === 0 && <Typography>No questions found.</Typography>}
-        {questions.map(q => (
-          <Box key={q.id} mb={2} p={2} border="1px solid #ccc" borderRadius={2}>
-            <Typography><strong>Q:</strong> {q.text}</Typography>
-            <Typography>A: {q.optionA}</Typography>
-            <Typography>B: {q.optionB}</Typography>
-            <Typography>C: {q.optionC}</Typography>
-            <Typography>D: {q.optionD}</Typography>
-            <Typography><strong>Correct:</strong> {q.correctAnswer}</Typography>
-          </Box>
+
+{questions.length === 0 ? (
+  <Typography>No questions found.</Typography>
+) : (
+  <TableContainer component={Paper}>
+    <Table>
+      <TableHead>
+        <TableRow>
+          <TableCell>Type</TableCell>
+          <TableCell>Question</TableCell>
+          <TableCell>Options</TableCell>
+          <TableCell>Answer</TableCell>
+          <TableCell>Actions</TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {questions.map((q) => (
+          <TableRow key={q.id}>
+            <TableCell>{q.type}</TableCell>
+            <TableCell>{q.text}</TableCell>
+            <TableCell>
+              {q.optionA && <>A: {q.optionA}<br /></>}
+              {q.optionB && <>B: {q.optionB}<br /></>}
+              {q.optionC && <>C: {q.optionC}<br /></>}
+              {q.optionD && <>D: {q.optionD}</>}
+            </TableCell>
+            <TableCell>{q.correctAnswer}</TableCell>
+            <TableCell>
+              <IconButton color="primary" onClick={() => handleEdit(q)}>
+                <EditIcon />
+              </IconButton>
+              <IconButton color="error" onClick={() => handleDelete(q.id)}>
+                <DeleteIcon />
+              </IconButton>
+            </TableCell>
+          </TableRow>
         ))}
+      </TableBody>
+    </Table>
+  </TableContainer>
+)}
       </Paper>
     </Box>
   );

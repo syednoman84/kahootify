@@ -10,6 +10,8 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { getToken } from '../utils/auth';
 import quizApi from '../utils/quizApi';
+import { Client } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 
 const LiveQuiz = () => {
   const [quizId, setQuizId] = useState(null);
@@ -24,7 +26,7 @@ const LiveQuiz = () => {
   useEffect(() => {
     const fetchQuiz = async () => {
       try {
-        const res = await quizApi.get('/player/active', {
+        const res = await quizApi.get('/player/quiz/waitingoractive', {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.data && res.data.quizId) {
@@ -54,14 +56,38 @@ const LiveQuiz = () => {
         setQuestionData(res.data);
         setStartTime(Date.now());
       } catch {
-        navigate('/summary');
+        // Don't redirect on error here — wait for QUIZ_ENDED signal
+        setQuestionData(null);
       } finally {
         setLoading(false);
       }
     };
 
     fetchQuestion();
-  }, [quizId, sequence, token, navigate]);
+  }, [quizId, sequence, token]);
+
+const wsBaseUrl = process.env.REACT_APP_QUIZ_SERVICE_URL.replace(/\/$/, '') + '/ws'; 
+
+useEffect(() => {
+  const client = new Client({
+    webSocketFactory: () => new SockJS(wsBaseUrl),
+    connectHeaders: { Authorization: `Bearer ${token}` },
+    onConnect: () => {
+      client.subscribe('/topic/quiz-status', (message) => {
+        const data = JSON.parse(message.body);
+        if (data.status === 'QUIZ_ENDED') {
+          navigate('/summary');
+        }
+      });
+    },
+    onStompError: (frame) => {
+      console.error('STOMP error:', frame.headers['message']);
+    }
+  });
+
+  client.activate();
+  return () => client.deactivate();
+}, [navigate, token, wsBaseUrl]);
 
   const handleAnswer = async (selectedAnswer) => {
     const timeTaken = Date.now() - startTime;
@@ -92,7 +118,7 @@ const LiveQuiz = () => {
     return (
       <Box p={10} textAlign="center">
         <CircularProgress />
-        <Typography mt={4}>Loading question...</Typography>
+        <Typography mt={4}>Waiting for next question...</Typography>
       </Box>
     );
 

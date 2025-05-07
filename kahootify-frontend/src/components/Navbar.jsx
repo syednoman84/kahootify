@@ -1,10 +1,10 @@
+// src/components/Navbar.jsx
 import React from 'react';
-import { AppBar, Toolbar, Typography, Box, Button } from '@mui/material';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const username = localStorage.getItem('username');
   const role = localStorage.getItem('role');
 
@@ -13,26 +13,37 @@ const Navbar = () => {
     navigate('/login');
   };
 
-  // Hide on login and signup
-  if (['/login', '/signup'].includes(location.pathname)) {
-    return null;
-  }
-
   return (
-    <AppBar position="static">
-      <Toolbar sx={{ justifyContent: 'space-between' }}>
-        <Typography variant="h6" component="div">
-          Kahootify
-        </Typography>
+    <AppBar position="static" color="primary">
+      <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Box display="flex" alignItems="center" gap={2}>
+          <Typography variant="h6" sx={{ cursor: 'pointer' }} onClick={() => navigate('/')}>
+            Kahootify
+          </Typography>
 
-        {username && (
-          <Box display="flex" alignItems="center" gap={2}>
-            <Typography variant="body1">
-              Welcome, {username} ({role})
-            </Typography>
-            <Button color="inherit" onClick={handleLogout}>Logout</Button>
-          </Box>
-        )}
+          {role === 'ADMIN' && (
+            <>
+              <Button color="inherit" onClick={() => navigate('/admin/dashboard')}>
+                Dashboard
+              </Button>
+              <Button color="inherit" onClick={() => navigate('/admin/create-quiz')}>
+                Create Quiz
+              </Button>
+              <Button color="inherit" onClick={() => navigate('/admin/questions')}>
+                Manage Questions
+              </Button>
+            </>
+          )}
+        </Box>
+
+        <Box display="flex" alignItems="center" gap={2}>
+          {username && <Typography>{username}</Typography>}
+          {username && (
+            <Button color="inherit" onClick={handleLogout}>
+              Logout
+            </Button>
+          )}
+        </Box>
       </Toolbar>
     </AppBar>
   );
