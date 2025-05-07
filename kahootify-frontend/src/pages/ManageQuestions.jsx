@@ -51,11 +51,21 @@ const ManageQuestions = () => {
         payload.optionD = '';
       }
 
-      await quizApi.post('/admin/questions', payload, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      if (form.id) {
+        // EDIT mode – send PUT request
+        await quizApi.put(`/admin/questions/${form.id}`, payload, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        alert('Question updated successfully');
+      } else {
+        // ADD mode – send POST request
+        await quizApi.post('/admin/questions', payload, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        alert('Question added successfully');
+      }
 
-      alert('Question added successfully');
+      // Reset form
       setForm({
         text: '',
         optionA: '',
@@ -63,14 +73,17 @@ const ManageQuestions = () => {
         optionC: '',
         optionD: '',
         correctAnswer: '',
-        type: 'MCQ'
+        type: 'MCQ',
+        id: undefined, // reset ID after submit
       });
+
       fetchQuestions();
     } catch (err) {
-      console.error('Failed to add question', err);
-      alert('Error adding question');
+      console.error('Failed to submit question', err);
+      alert('Error submitting question');
     }
   };
+
 
   const handleEdit = (question) => {
     setForm({
@@ -84,7 +97,7 @@ const ManageQuestions = () => {
       id: question.id, // Add id to form state for update
     });
   };
-  
+
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this question?')) return;
     try {
@@ -97,7 +110,7 @@ const ManageQuestions = () => {
       alert('Error deleting question');
     }
   };
-  
+
   return (
     <Box maxWidth={1100} mx="auto" mt={4}>
       <Paper elevation={4} sx={{ padding: 4 }}>
@@ -159,53 +172,55 @@ const ManageQuestions = () => {
             />
           )}
 
-          <Button variant="contained" onClick={handleSubmit}>Add Question</Button>
+          <Button variant="contained" onClick={handleSubmit}>
+            {form.id ? 'Update Question' : 'Add Question'}
+          </Button>
         </Stack>
 
         <Divider sx={{ my: 4 }} />
 
         <Typography variant="h6" gutterBottom>Existing Questions</Typography>
 
-{questions.length === 0 ? (
-  <Typography>No questions found.</Typography>
-) : (
-  <TableContainer component={Paper}>
-    <Table>
-      <TableHead>
-        <TableRow>
-          <TableCell>Type</TableCell>
-          <TableCell>Question</TableCell>
-          <TableCell>Options</TableCell>
-          <TableCell>Answer</TableCell>
-          <TableCell>Actions</TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {questions.map((q) => (
-          <TableRow key={q.id}>
-            <TableCell>{q.type}</TableCell>
-            <TableCell>{q.text}</TableCell>
-            <TableCell>
-              {q.optionA && <>A: {q.optionA}<br /></>}
-              {q.optionB && <>B: {q.optionB}<br /></>}
-              {q.optionC && <>C: {q.optionC}<br /></>}
-              {q.optionD && <>D: {q.optionD}</>}
-            </TableCell>
-            <TableCell>{q.correctAnswer}</TableCell>
-            <TableCell>
-              <IconButton color="primary" onClick={() => handleEdit(q)}>
-                <EditIcon />
-              </IconButton>
-              <IconButton color="error" onClick={() => handleDelete(q.id)}>
-                <DeleteIcon />
-              </IconButton>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  </TableContainer>
-)}
+        {questions.length === 0 ? (
+          <Typography>No questions found.</Typography>
+        ) : (
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Type</TableCell>
+                  <TableCell>Question</TableCell>
+                  <TableCell>Options</TableCell>
+                  <TableCell>Answer</TableCell>
+                  <TableCell>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {questions.map((q) => (
+                  <TableRow key={q.id}>
+                    <TableCell>{q.type}</TableCell>
+                    <TableCell>{q.text}</TableCell>
+                    <TableCell>
+                      {q.optionA && <>A: {q.optionA}<br /></>}
+                      {q.optionB && <>B: {q.optionB}<br /></>}
+                      {q.optionC && <>C: {q.optionC}<br /></>}
+                      {q.optionD && <>D: {q.optionD}</>}
+                    </TableCell>
+                    <TableCell>{q.correctAnswer}</TableCell>
+                    <TableCell>
+                      <IconButton color="primary" onClick={() => handleEdit(q)}>
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton color="error" onClick={() => handleDelete(q.id)}>
+                        <DeleteIcon />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
       </Paper>
     </Box>
   );
