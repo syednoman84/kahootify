@@ -78,6 +78,7 @@ public class QuizService {
         int total = quizQuestionRepository.countByQuiz(quiz);
 
         return new QuestionViewResponse(
+                q.getId(),
                 q.getText(),
                 q.getOptionA(),
                 q.getOptionB(),

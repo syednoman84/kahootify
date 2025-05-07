@@ -108,7 +108,7 @@ const AdminDashboard = () => {
               </Button>
               <Button
                 variant="outlined"
-                onClick={() => navigate(`/admin/quiz/${activeQuiz.id}/results`)}
+                onClick={() => navigate(`/admin/quizzes/${activeQuiz.id}/results`)}
                 disabled={!activeQuiz}
               >
                 View Results

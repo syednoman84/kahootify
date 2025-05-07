@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class QuestionViewResponse {
+    private Long id;
     private String questionText;
     private String optionA;
     private String optionB;

@@ -22,12 +22,7 @@ const QuizSummary = () => {
   useEffect(() => {
     const fetchSummary = async () => {
       try {
-        const activeRes = await quizApi.get('/player/quiz/waitingoractive', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const id = quizId || activeRes.data.quizId;
-
-        const res = await quizApi.get(`/player/quiz/${id}/summary`, {
+        const res = await quizApi.get(`/player/quiz/${quizId}/summary`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setSummary(res.data);
@@ -38,9 +33,10 @@ const QuizSummary = () => {
         setLoading(false);
       }
     };
-
-    fetchSummary();
+  
+    if (quizId) fetchSummary();
   }, [token, quizId]);
+  
 
   if (loading) {
     return (

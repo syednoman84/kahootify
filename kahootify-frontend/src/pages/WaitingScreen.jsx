@@ -12,10 +12,11 @@ import SockJS from 'sockjs-client';
 const WaitingScreen = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
+  const wsBaseUrl = process.env.REACT_APP_QUIZ_SERVICE_URL.replace(/\/$/, '') + '/ws';
 
   useEffect(() => {
     const client = new Client({
-      webSocketFactory: () => new SockJS('http://localhost:8082/ws'),
+      webSocketFactory: () => new SockJS(wsBaseUrl),
       connectHeaders: {
         Authorization: `Bearer ${token}`
       },

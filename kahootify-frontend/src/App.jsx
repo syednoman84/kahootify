@@ -14,6 +14,7 @@ import ManageQuestions from './pages/ManageQuestions';
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
 import Logout from './pages/Logout';
+import AdminQuizResults from './pages/AdminQuizResults';
 
 function App() {
   return (
@@ -45,7 +46,7 @@ function App() {
           }
         />
         <Route
-          path="/summary"
+          path="/summary/:quizId"
           element={
             <ProtectedRoute allowedRoles={['PLAYER']}>
               <QuizSummary />
@@ -78,6 +79,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/admin/quizzes/:quizId/results" element={<AdminQuizResults />} />
       </Routes>
     </Router>
   );
