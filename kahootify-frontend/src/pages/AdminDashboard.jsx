@@ -112,7 +112,7 @@ const AdminDashboard = () => {
 
       <Stack direction="row" spacing={2}>
         <Button variant="contained" onClick={() => navigate('/admin/create-quiz')}>Create New Quiz</Button>
-        <Button variant="outlined" onClick={() => navigate('/admin/questions')}>Manage Questions</Button>
+        <Button variant="contained" onClick={() => navigate('/admin/questions')}>Manage Questions</Button>
       </Stack>
 
       <Paper sx={{ p: 3, mb: 4 }}>
@@ -126,7 +126,6 @@ const AdminDashboard = () => {
                 <TableRow>
                   <TableCell>ID</TableCell>
                   <TableCell>Title</TableCell>
-                  <TableCell>Questions</TableCell>
                   <TableCell>Created At</TableCell>
                   <TableCell>Actions</TableCell>
                 </TableRow>
@@ -136,8 +135,7 @@ const AdminDashboard = () => {
                   <TableRow key={quiz.id}>
                     <TableCell>{quiz.id}</TableCell>
                     <TableCell>{quiz.title}</TableCell>
-                    <TableCell>{quiz.questions?.length || 0}</TableCell>
-                    <TableCell>{new Date(quiz.createdAt).toLocaleString()}</TableCell>
+                    <TableCell>{new Date(quiz.startedAt).toLocaleString()}</TableCell>
                     <TableCell>
                       <IconButton color="error" onClick={() => deleteQuiz(quiz.id)}>
                         <DeleteIcon />

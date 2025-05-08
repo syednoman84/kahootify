@@ -15,14 +15,22 @@ public class Question {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(columnDefinition = "TEXT")
     private String text;
 
     @Enumerated(EnumType.STRING)
     private QuestionType type; // MCQ or TRUE_FALSE
 
+    @Column(columnDefinition = "TEXT")
     private String optionA;
+
+    @Column(columnDefinition = "TEXT")
     private String optionB;
-    private String optionC; // optional for TRUE_FALSE
+
+    @Column(columnDefinition = "TEXT")
+    private String optionC;
+
+    @Column(columnDefinition = "TEXT")// optional for TRUE_FALSE
     private String optionD; // optional for TRUE_FALSE
 
     private String correctAnswer; // e.g., "A", "True", etc.

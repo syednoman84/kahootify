@@ -313,7 +313,7 @@ public class QuizService {
     }
 
     public List<Quiz> getAllQuizzes() {
-        return quizRepository.findAll(); // Make sure quizRepository is autowired/injected
+        return quizRepository.findAllOrderByIdDesc();
     }
 
     @Transactional

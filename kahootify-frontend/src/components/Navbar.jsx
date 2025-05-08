@@ -1,7 +1,8 @@
 // src/components/Navbar.jsx
 import React from 'react';
 import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -16,8 +17,18 @@ const Navbar = () => {
   return (
     <AppBar position="static" color="primary">
       <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Box display="flex" alignItems="center" gap={2}>
-          <Typography variant="h6" sx={{ cursor: 'pointer' }} onClick={() => navigate('/')}>
+        <Box display="flex" alignItems="center" gap={3}>
+          <Typography
+            variant="h4"
+            component={Link}
+            to="/"
+            sx={{
+              fontFamily: '"Pacifico", cursive',
+              textDecoration: 'none',
+              color: '#ffffff',
+              textShadow: '2px 2px 4px rgba(0,0,0,0.3)',
+            }}
+          >
             Kahootify
           </Typography>
 

@@ -59,6 +59,7 @@ const LiveQuiz = () => {
         setTimeLeft(10);
         setHasAnswered(false);
       } catch {
+        // No more questions available, end the quiz for this user
         navigate(`/summary/${quizId}`);
       } finally {
         setLoading(false);
@@ -67,6 +68,7 @@ const LiveQuiz = () => {
 
     fetchQuestion();
   }, [quizId, sequence, token, navigate]);
+
 
   useEffect(() => {
     if (!questionData || hasAnswered) return;
@@ -149,16 +151,17 @@ const LiveQuiz = () => {
       { label: 'B', text: 'False' }
     ];
 
+
   const mcqColors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12']; // red, blue, green, orange
 
   return (
-    <Box height="100vh" display="flex" flexDirection="column">
-      <Box flexGrow={0} p={2} display="flex" flexDirection="column" alignItems="center">
+    <Box p={4} height="100vh" display="flex" flexDirection="column" justifyContent="center" alignItems="center">
+      <Stack spacing={4} alignItems="center" width="100%">
         <Box position="relative" display="inline-flex">
           <CircularProgress
             variant="determinate"
             value={(timeLeft / 10) * 100}
-            size={80}
+            size={100}
             thickness={5}
             sx={{ color: timeLeft <= 3 ? 'error.main' : 'primary.main' }}
           />
@@ -172,79 +175,79 @@ const LiveQuiz = () => {
             alignItems="center"
             justifyContent="center"
           >
-            <Typography variant="h6">{timeLeft}s</Typography>
+            <Typography variant="h5" component="div" color="textPrimary">
+              {timeLeft}s
+            </Typography>
           </Box>
         </Box>
 
-        <Typography variant="h6" mt={1}>
+
+
+        <Typography variant="h5" fontWeight="bold">
           Question {questionData.sequenceNumber || sequence} of {questionData.totalQuestions || '?'}
         </Typography>
 
-        <Typography variant="body1" align="left" width="100%" mt={1}>
+        <Typography variant="h6" textAlign="center">
           {questionData.questionText || 'No question text found'}
         </Typography>
-      </Box>
 
-      <Box flexGrow={1} p={2} display="flex" flexDirection="column" justifyContent="center">
-        {isMCQ ? (
-          [0, 1].map((row) => (
-            <Box key={row} display="flex" flex={1} gap={2}>
-              {[0, 1].map((col) => {
-                const index = row * 2 + col;
-                const { label, text } = options[index];
-                return (
+        <Stack spacing={3} width="100%" maxWidth="1000px">
+          {isMCQ ? (
+            [0, 1].map((row) => (
+              <Box key={row} display="flex" gap={3} width="100%">
+                {[0, 1].map((col) => {
+                  const index = row * 2 + col;
+                  const { label, text } = options[index];
+                  return (
+                    <Box key={index} flex={1}>
+                      <Button
+                        fullWidth
+                        variant="contained"
+                        sx={{
+                          height: '200px',
+                          fontSize: '1.6rem',
+                          borderRadius: '16px',
+                          whiteSpace: 'normal',
+                          wordBreak: 'break-word',
+                          backgroundColor: mcqColors[index],
+                          '&:hover': {
+                            backgroundColor: `${mcqColors[index]}cc`, // lighter on hover
+                          }
+                        }}
+                        onClick={() => handleAnswer(label)}
+                      >
+                        {text}
+                      </Button>
+                    </Box>
+                  );
+                })}
+              </Box>
+            ))
+          ) : (
+            <Box display="flex" gap={3} width="100%">
+              {options.map(({ label, text }, idx) => (
+                <Box key={label} flex={1}>
                   <Button
-                    key={index}
                     fullWidth
                     variant="contained"
+                    color={text === 'True' ? 'success' : 'error'}
                     sx={{
-                      m: 1,
-                      textTransform: 'none',
-                      fontSize: '1.2rem',
-                      borderRadius: '12px',
-                      backgroundColor: mcqColors[index],
-                      '&:hover': {
-                        backgroundColor: `${mcqColors[index]}cc`,
-                      },
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'flex-start',
-                      px: 2,
-                      flexGrow: 1,
+                      height: '200px',
+                      fontSize: '1.8rem',
+                      borderRadius: '16px',
+                      whiteSpace: 'normal',
+                      wordBreak: 'break-word',
                     }}
                     onClick={() => handleAnswer(label)}
                   >
                     {text}
                   </Button>
-                );
-              })}
+                </Box>
+              ))}
             </Box>
-          ))
-        ) : (
-          <Box display="flex" gap={2} flex={1}>
-            {options.map(({ label, text }, idx) => (
-              <Button
-                key={label}
-                fullWidth
-                variant="contained"
-                color={text === 'True' ? 'success' : 'error'}
-                sx={{
-                  fontSize: '1.4rem',
-                  borderRadius: '16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexGrow: 1,
-                  textTransform: 'none',
-                }}
-                onClick={() => handleAnswer(label)}
-              >
-                {text}
-              </Button>
-            ))}
-          </Box>
-        )}
-      </Box>
+          )}
+        </Stack>
+      </Stack>
     </Box>
   );
 };
