@@ -1,11 +1,9 @@
-🚀 **Kahootify – Real-Time Multiplayer Quiz Platform**
+# 🚀 **Kahootify – Real-Time Multiplayer Quiz Platform**
 
-Tech Stack: React, Spring Boot, WebSockets (STOMP), PostgreSQL, JWT, Material UI
-
-Overview:
+## Overview:
 Kahootify is a full-stack, real-time educational quiz platform inspired by Kahoot!, designed to facilitate interactive classroom and team learning experiences. The platform supports both players and administrators with role-based access and a vibrant, mobile-responsive dark UI.
 
-🔧 **Key Features:**
+## 🔧 **Key Features:**
 
     🧑‍🏫 Admin Module
 
@@ -46,3 +44,23 @@ Kahootify is a full-stack, real-time educational quiz platform inspired by Kahoo
     Designed with separation of concerns, scalable data models, and clean architecture
 
     Polished UI with custom fonts, vibrant dark theme, and responsive layout
+
+
+## 🛠️ Tech Stack
+
+### Frontend
+- React + React Router
+- Material UI (MUI)
+- WebSocket (STOMP over SockJS)
+- JWT for authentication
+
+### Backend
+- Spring Boot (Java)
+- PostgreSQL
+- Spring Security
+- WebSocket (STOMP)
+- REST APIs
+
+## ✨ Inspired By
+
+Kahoot! but fully custom-built and open source.
