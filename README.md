@@ -1,7 +1,7 @@
 # 🚀 **Kahootify – Real-Time Multiplayer Quiz Platform**
 
 ## Overview:
-Kahootify is a full-stack, real-time educational quiz platform inspired by Kahoot!, designed to facilitate interactive classroom and team learning experiences. The platform supports both players and administrators with role-based access and a vibrant, mobile-responsive dark UI.
+Kahootify is a full-stack, microservices-based real-time educational quiz platform inspired by Kahoot!, designed to facilitate interactive classroom and team learning experiences. The platform supports both players and administrators with role-based access and a vibrant, mobile-responsive dark UI.
 
 ## 🔧 **Key Features:**
 
