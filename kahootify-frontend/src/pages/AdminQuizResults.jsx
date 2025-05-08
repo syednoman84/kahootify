@@ -1,34 +1,25 @@
 import React, { useEffect, useState } from 'react';
+import {
+  Box, Typography, Table, TableHead, TableBody, TableRow, TableCell, Paper, CircularProgress
+} from '@mui/material';
 import { useParams } from 'react-router-dom';
 import quizApi from '../utils/quizApi';
-import { getToken } from '../utils/auth';
-import {
-  Box,
-  Typography,
-  CircularProgress,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  Paper,
-} from '@mui/material';
 
 const AdminQuizResults = () => {
   const { quizId } = useParams();
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
-  const token = getToken();
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
     const fetchResults = async () => {
       try {
-        const res = await quizApi.get(`/admin/quizzes/${quizId}/results`, {
-          headers: { Authorization: `Bearer ${token}` },
+        const res = await quizApi.get(`/admin/quizzes/${quizId}/results/detail`, {
+          headers: { Authorization: `Bearer ${token}` }
         });
         setResults(res.data);
       } catch (err) {
-        console.error('Error fetching results', err);
+        console.error('Failed to fetch results', err);
       } finally {
         setLoading(false);
       }
@@ -46,38 +37,28 @@ const AdminQuizResults = () => {
     );
   }
 
-  if (!results.length) {
-    return (
-      <Box p={10} textAlign="center">
-        <Typography>No results found for this quiz.</Typography>
-      </Box>
-    );
-  }
-
   return (
     <Box p={6}>
-      <Typography variant="h4" mb={4}>
-        Results for Quiz #{quizId}
-      </Typography>
+      <Typography variant="h5" gutterBottom>Quiz Results</Typography>
       <Paper>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell><strong>User</strong></TableCell>
-              <TableCell><strong>Score</strong></TableCell>
-              <TableCell><strong>Correct Answers</strong></TableCell>
-              <TableCell><strong>Total Time (s)</strong></TableCell>
-              <TableCell><strong>Rank</strong></TableCell>
+              <TableCell>Rank</TableCell>
+              <TableCell>Username</TableCell>
+              <TableCell>Total Questions</TableCell>
+              <TableCell>Correct Answers</TableCell>
+              <TableCell>Total Score</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {results.map((row, idx) => (
+            {results.map((res, idx) => (
               <TableRow key={idx}>
-                <TableCell>{row.username}</TableCell>
-                <TableCell>{row.totalScore}</TableCell>
-                <TableCell>{row.correctAnswers}</TableCell>
-                <TableCell>{Math.round(row.totalTimeMillis / 1000)}</TableCell>
-                <TableCell>#{row.rank}</TableCell>
+                <TableCell>{res.rank}</TableCell>
+                <TableCell>{res.username}</TableCell>
+                <TableCell>{res.totalQuestions}</TableCell>
+                <TableCell>{res.correctAnswers}</TableCell>
+                <TableCell>{res.totalScore}</TableCell>
               </TableRow>
             ))}
           </TableBody>

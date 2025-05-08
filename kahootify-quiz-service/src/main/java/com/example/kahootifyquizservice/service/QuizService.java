@@ -9,6 +9,7 @@ import com.example.kahootifyquizservice.dto.response.QuizSummaryResponse;
 import com.example.kahootifyquizservice.entity.*;
 import com.example.kahootifyquizservice.repository.*;
 import com.example.kahootifyquizservice.websocket.LeaderboardBroadcaster;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -310,6 +311,25 @@ public class QuizService {
 
         return quiz;
     }
+
+    public List<Quiz> getAllQuizzes() {
+        return quizRepository.findAll(); // Make sure quizRepository is autowired/injected
+    }
+
+    @Transactional
+    public void deleteQuiz(Long quizId) {
+        Quiz quiz = quizRepository.findById(quizId)
+                .orElseThrow(() -> new RuntimeException("Quiz not found"));
+
+        // 1. Delete user answers
+        userAnswerRepository.deleteByQuizId(quizId);
+
+        // 2. Delete quiz results
+        quizResultRepository.deleteByQuizId(quizId);
+
+        quizRepository.delete(quiz); // triggers cascade & orphan removal
+    }
+
 
 
 }

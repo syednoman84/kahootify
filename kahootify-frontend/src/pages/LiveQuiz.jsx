@@ -65,10 +65,10 @@ const LiveQuiz = () => {
         setLoading(false);
       }
     };
-  
+
     fetchQuestion();
   }, [quizId, sequence, token, navigate]);
-  
+
 
   useEffect(() => {
     if (!questionData || hasAnswered) return;
@@ -140,17 +140,38 @@ const LiveQuiz = () => {
     );
 
   const isMCQ = !!questionData.optionC;
+
   const options = isMCQ
-    ? ['A', 'B', 'C', 'D'].map((letter) => questionData[`option${letter}`])
-    : ['True', 'False'];
-    const mcqColors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12']; // red, blue, green, orange
+    ? ['A', 'B', 'C', 'D'].map((letter) => ({
+      label: letter,
+      text: questionData[`option${letter}`],
+    }))
+    : [
+      { label: 'A', text: 'True' },
+      { label: 'B', text: 'False' }
+    ];
+
+
+  const mcqColors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12']; // red, blue, green, orange
 
   return (
     <Box p={4} height="100vh" display="flex" flexDirection="column" justifyContent="center" alignItems="center">
       <Stack spacing={4} alignItems="center" width="100%">
-        <Typography variant="h4" fontWeight="bold" color="primary">
-          Time Left: {timeLeft}s
-        </Typography>
+        <Box position="relative" display="inline-flex">
+          <CircularProgress
+            variant="determinate"
+            value={(timeLeft / 10) * 100}
+            size={100}
+            thickness={5}
+            sx={{ color: timeLeft <= 3 ? 'error.main' : 'primary.main' }}
+          />
+          <Box p={4} mt={8} display="flex" flexDirection="column" alignItems="center">
+            <Typography variant="h5" component="div" color="textPrimary">
+              {timeLeft}s
+            </Typography>
+          </Box>
+        </Box>
+
 
         <Typography variant="h5" fontWeight="bold">
           Question {questionData.sequenceNumber || sequence} of {questionData.totalQuestions || '?'}
@@ -166,7 +187,7 @@ const LiveQuiz = () => {
               <Box key={row} display="flex" gap={3} width="100%">
                 {[0, 1].map((col) => {
                   const index = row * 2 + col;
-                  const text = options[index];
+                  const { label, text } = options[index];
                   return (
                     <Box key={index} flex={1}>
                       <Button
@@ -183,7 +204,7 @@ const LiveQuiz = () => {
                             backgroundColor: `${mcqColors[index]}cc`, // lighter on hover
                           }
                         }}
-                        onClick={() => handleAnswer(text)}
+                        onClick={() => handleAnswer(label)}
                       >
                         {text}
                       </Button>
@@ -194,12 +215,12 @@ const LiveQuiz = () => {
             ))
           ) : (
             <Box display="flex" gap={3} width="100%">
-              {options.map((val, idx) => (
-                <Box key={val} flex={1}>
+              {options.map(({ label, text }, idx) => (
+                <Box key={label} flex={1}>
                   <Button
                     fullWidth
                     variant="contained"
-                    color={val === 'True' ? 'success' : 'error'}
+                    color={text === 'True' ? 'success' : 'error'}
                     sx={{
                       height: '200px',
                       fontSize: '1.8rem',
@@ -207,9 +228,9 @@ const LiveQuiz = () => {
                       whiteSpace: 'normal',
                       wordBreak: 'break-word',
                     }}
-                    onClick={() => handleAnswer(val)}
+                    onClick={() => handleAnswer(label)}
                   >
-                    {val}
+                    {text}
                   </Button>
                 </Box>
               ))}

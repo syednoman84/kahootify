@@ -8,5 +8,7 @@ import java.util.List;
 public interface UserAnswerRepository extends JpaRepository<UserAnswer, Long> {
     boolean existsByUserIdAndQuizIdAndQuestionId(Long userId, Long quizId, Long questionId);
     List<UserAnswer> findByQuizId(Long quizId);
+    void deleteByQuizId(Long quizId);
+
 
 }

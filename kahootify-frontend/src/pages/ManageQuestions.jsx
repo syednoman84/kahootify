@@ -179,7 +179,7 @@ const ManageQuestions = () => {
 
         <Divider sx={{ my: 4 }} />
 
-        <Typography variant="h6" gutterBottom>Existing Questions</Typography>
+        <Typography variant="h6" gutterBottom>List of Questions</Typography>
 
         {questions.length === 0 ? (
           <Typography>No questions found.</Typography>

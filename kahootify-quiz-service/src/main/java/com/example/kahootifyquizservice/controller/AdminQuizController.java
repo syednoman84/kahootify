@@ -43,14 +43,27 @@ public class AdminQuizController {
     @PostMapping("/create")
     public ResponseEntity<Quiz> createQuiz(@RequestBody CreateQuizRequest request) {
         Quiz quiz = quizService.createQuiz(request);
-        quizStatusBroadcaster.broadcastQuizStarted(quiz.getId(), quiz.getTitle());
+        quizStatusBroadcaster.broadcastQuizStarted(quiz.getId(), quiz.getTitle(), quiz.getStartedAt(), quiz.getEndedAt());
         return ResponseEntity.ok(quiz);
     }
 
     @PostMapping("/{quizId}/stop")
     public ResponseEntity<Void> stopQuiz(@PathVariable Long quizId) {
         Quiz quiz = quizService.stopQuiz(quizId);
-        quizStatusBroadcaster.broadcastQuizEnded(quiz.getId(), quiz.getTitle());
+        quizStatusBroadcaster.broadcastQuizEnded(quiz.getId(), quiz.getTitle(), quiz.getStartedAt(), quiz.getEndedAt());
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping
+    public ResponseEntity<List<Quiz>> getAllQuizzes() {
+        List<Quiz> quizzes = quizService.getAllQuizzes();
+        return ResponseEntity.ok(quizzes);
+    }
+
+    @DeleteMapping("/{quizId}")
+    public ResponseEntity<Void> deleteQuiz(@PathVariable Long quizId) {
+        quizService.deleteQuiz(quizId);
+        return ResponseEntity.noContent().build();
+    }
+
 }

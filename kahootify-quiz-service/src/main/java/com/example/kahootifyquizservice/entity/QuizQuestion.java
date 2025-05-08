@@ -1,5 +1,6 @@
 package com.example.kahootifyquizservice.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,11 +16,15 @@ public class QuizQuestion {
     private Long id;
 
     @ManyToOne
-    private Quiz quiz;
-
-    @ManyToOne
     private Question question;
 
     private int sequenceOrder; // e.g., 1, 2, 3
+
+    @ManyToOne
+    @JoinColumn(name = "quiz_id", nullable = false)
+    @JsonBackReference
+    private Quiz quiz;
+
+
 }
 

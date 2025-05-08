@@ -8,5 +8,7 @@ import java.util.List;
 public interface QuizResultRepository extends JpaRepository<QuizResult, Long> {
     List<QuizResult> findByQuizIdOrderByScoreDescTotalTimeMsAsc(Long quizId);
     List<QuizResult> findByUserId(Long userId);
+    void deleteByQuizId(Long quizId);
+
 
 }
